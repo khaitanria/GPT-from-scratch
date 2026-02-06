@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "gptfs"
+version = "0.1.0"
+description = "GPT-from-scratch in PyTorch refactored into a testable production style codebase"
+readme = "README.md"
+packages = [{ include = "gptfs", from = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+torch = "^2.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[build-system]
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"
