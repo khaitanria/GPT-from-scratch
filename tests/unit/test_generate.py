@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Mapping
+from collections.abc import Mapping
 
 import torch
 import torch.nn as nn
@@ -47,14 +47,21 @@ def test_generate_returns_expected_length_and_chars() -> None:
     int_to_char: Mapping[int, str] = {0: "a", 1: "b", 2: "c", 3: "d", 4: "e"}
 
     context = torch.zeros((1, 1), dtype=torch.long)
-    out = generate(model=model, new_chars=new_chars, context=context, context_length=context_length, int_to_char=int_to_char)
+    out = generate(
+        model=model,
+        new_chars=new_chars,
+        context=context,
+        context_length=context_length,
+        int_to_char=int_to_char,
+    )
 
     assert out == "a" * new_chars
 
 
 def test_generate_trims_context_to_context_length() -> None:
     """
-    Verifies generate trims the rolling context so the model never receives more than context_length tokens.
+    Verifies generate trims the rolling context so the model never receives more than
+    context_length tokens.
     """
     torch.manual_seed(0)
 
@@ -67,7 +74,13 @@ def test_generate_trims_context_to_context_length() -> None:
 
     # Start with an intentionally long context; generate should trim before calling the model
     context = torch.zeros((1, 10), dtype=torch.long)
-    out = generate(model=model, new_chars=new_chars, context=context, context_length=context_length, int_to_char=int_to_char)
+    out = generate(
+        model=model,
+        new_chars=new_chars,
+        context=context,
+        context_length=context_length,
+        int_to_char=int_to_char,
+    )
 
     assert out == "a" * new_chars
 
@@ -90,6 +103,12 @@ def test_generate_device_matches_input() -> None:
     int_to_char: Mapping[int, str] = {0: "a", 1: "b", 2: "c", 3: "d", 4: "e"}
 
     context = torch.zeros((1, 1), dtype=torch.long, device="cuda")
-    out = generate(model=model, new_chars=new_chars, context=context, context_length=context_length, int_to_char=int_to_char)
+    out = generate(
+        model=model,
+        new_chars=new_chars,
+        context=context,
+        context_length=context_length,
+        int_to_char=int_to_char,
+    )
 
     assert out == "a" * new_chars

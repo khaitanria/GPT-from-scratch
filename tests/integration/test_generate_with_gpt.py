@@ -114,7 +114,8 @@ def test_generate_with_gpt_output_characters_are_valid() -> None:
 
 def test_generate_with_gpt_trims_context_to_context_length() -> None:
     """
-    Verifies generate trims the rolling context so GPT is never given more than context_length tokens.
+    Verifies generate trims the rolling context so GPT is never given more than
+    context_length tokens.
 
     This is an indirect integration check: if generate fails to trim, GPT should error when the
     input length exceeds context_length due to positional embedding shape mismatch.

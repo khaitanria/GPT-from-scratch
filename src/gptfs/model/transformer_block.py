@@ -3,8 +3,8 @@ from __future__ import annotations
 import torch
 import torch.nn as nn
 
-from gptfs.model.multi_head_self_attention import MultiHeadSelfAttention
 from gptfs.model.feed_forward_neural_network import FeedForwardNeuralNetwork
+from gptfs.model.multi_head_self_attention import MultiHeadSelfAttention
 
 
 class TransformerBlock(nn.Module):
@@ -21,8 +21,8 @@ class TransformerBlock(nn.Module):
         returns: [batch, context_length, model_dim]
         """
         first_norm = self.norm_first(embedded)
-        embedded = embedded + self.mult_attn(first_norm) # add / skip connection
-        
+        embedded = embedded + self.mult_attn(first_norm)  # add / skip connection
+
         second_norm = self.norm_second(embedded)
-        embedded = embedded + self.feed_forward(second_norm) # add / skip connection
+        embedded = embedded + self.feed_forward(second_norm)  # add / skip connection
         return embedded

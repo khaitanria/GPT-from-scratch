@@ -17,17 +17,19 @@ class SingleHeadAttention(nn.Module):
         returns:  [batch, context_length, head_size]
         """
         # softmax((Q@K^T) / sqrt(attention_dim)) @ V
-        keys = self.key_layer(embedded) # [batch x context_length x head_size]
-        queries = self.query_layer(embedded) # [batch x context_length x head_size]
-        attn_dim = keys.shape[-1] # head size
-        attention_scores = (queries @ torch.transpose(keys, 1, 2)) / (attn_dim ** 0.5) # [batch x context_length x context_length]
+        keys = self.key_layer(embedded)  # [batch x context_length x head_size]
+        queries = self.query_layer(embedded)  # [batch x context_length x head_size]
+        attn_dim = keys.shape[-1]  # head size
+        attention_scores = (queries @ torch.transpose(keys, 1, 2)) / (
+            attn_dim**0.5
+        )  # [batch x context_length x context_length]
 
         # masking
         cntxt_len = keys.shape[1]
         # mask on the same device as embedded to ensure GPU compatibility
         mask = torch.tril(torch.ones(cntxt_len, cntxt_len, device=embedded.device)) == 0
-        attention_scores = attention_scores.masked_fill(mask, float('-inf'))
+        attention_scores = attention_scores.masked_fill(mask, float("-inf"))
 
         softmax_result = torch.nn.functional.softmax(attention_scores, dim=-1)
-        values = self.value_layer(embedded) # [batch x context_length x head_size]
+        values = self.value_layer(embedded)  # [batch x context_length x head_size]
         return softmax_result @ values
