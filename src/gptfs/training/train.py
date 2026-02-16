@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from .training_config import TrainingConfig
+from gptfs.training.training_config import TrainingConfig
+from gptfs.training.training_result import TrainingResult
 
 
-def train(config: TrainingConfig) -> None:
+def train(config: TrainingConfig) -> TrainingResult:
     """
     Training entrypoint.
 
