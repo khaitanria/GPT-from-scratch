@@ -15,6 +15,8 @@ class TrainingConfig:
     runs_dir: Path = Path("artifacts/runs")
     run_name: str = "debug-run"
 
+    corpus_files: tuple[str, ...] = ("dataset.txt",)
+
     device: str = "auto"
     seed: int = 1337
 
@@ -34,6 +36,8 @@ class TrainingConfig:
     save_interval: int = 200
     save_step_checkpoints: bool = False
 
+    train_split: float = 0.9
+
     @property
     def run_dir(self) -> Path:
         """
@@ -50,4 +54,5 @@ class TrainingConfig:
         data["processed_data_dir"] = str(self.processed_data_dir)
         data["runs_dir"] = str(self.runs_dir)
         data["run_dir"] = str(self.run_dir)
+        data["corpus_files"] = list(self.corpus_files)
         return data
