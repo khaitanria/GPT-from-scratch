@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import json
+import math
+from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import torch
 import torch.nn.functional as F
@@ -28,6 +32,8 @@ def train(config: TrainingConfig) -> TrainingResult:
 
     run_dir = config.run_dir
     run_dir.mkdir(parents=True, exist_ok=True)
+
+    metrics_path = run_dir / "metrics.jsonl"
 
     text = load_text_corpus(raw_data_dir=config.raw_data_dir, file_names=config.corpus_files)
     stoi, itos = build_vocab(text)
@@ -103,6 +109,30 @@ def train(config: TrainingConfig) -> TrainingResult:
                 eval_steps=config.eval_steps,
                 device=device,
             )
+
+            epoch, epoch_fraction = _compute_epoch_progress(
+                tokens_processed=tokens_processed,
+                train_tokens=len(train_ids),
+            )
+            lr = float(optimizer.param_groups[0]["lr"])
+
+            _append_metrics_jsonl(
+                metrics_path=metrics_path,
+                record={
+                    "run_name": config.run_name,
+                    "timestamp_utc": datetime.now(UTC).isoformat(),
+                    "step": step,
+                    "tokens_processed": tokens_processed,
+                    "epoch": epoch,
+                    "epoch_fraction": epoch_fraction,
+                    "train_loss": float(final_train_loss),
+                    "val_loss": None if final_val_loss is None else float(final_val_loss),
+                    "train_ppl": _safe_exp(float(final_train_loss)),
+                    "val_ppl": None if final_val_loss is None else _safe_exp(float(final_val_loss)),
+                    "learning_rate": lr,
+                },
+            )
+
             if final_val_loss is None:
                 print(f"[eval] step={step} train_loss={final_train_loss:.4f} val_loss=NA")
             else:
@@ -286,3 +316,17 @@ def _compute_epoch_progress(*, tokens_processed: int, train_tokens: int) -> tupl
     epoch = int(epoch_float)
     epoch_fraction = float(epoch_float - epoch)
     return epoch, epoch_fraction
+
+
+def _append_metrics_jsonl(*, metrics_path: Path, record: dict[str, Any]) -> None:
+    metrics_path.parent.mkdir(parents=True, exist_ok=True)
+    line = json.dumps(record, sort_keys=True)
+    with metrics_path.open("a", encoding="utf-8") as f:
+        f.write(line + "\n")
+
+
+def _safe_exp(x: float) -> float:
+    try:
+        return float(math.exp(x))
+    except OverflowError:
+        return float("inf")
