@@ -208,3 +208,19 @@ __marimo__/
 
 # Poetry virtual environment
 .venv/
+
+# ------------------------------
+# Data + Training Artifacts
+# ------------------------------
+
+# Raw data: never commit dataset files
+data/raw/shakespeare/*
+!data/raw/shakespeare/.gitkeep
+
+# Processed data: keep directory, ignore generated contents
+data/processed/*
+!data/processed/.gitkeep
+
+# Training run outputs: keep structure, ignore run contents
+artifacts/runs/*
+!artifacts/runs/.gitkeep
